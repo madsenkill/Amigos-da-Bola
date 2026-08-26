@@ -12,7 +12,7 @@
 
 export const CONFIG = {
   // ---- Supabase (opcional) ------------------------------------
-  SUPABASE_URL: 'https://gvdsjlunsgduydgwudgs.supabase.co/rest/v1/',
+  SUPABASE_URL: 'https://gvdsjlunsgduydgwudgs.supabase.co',
   SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2ZHNqbHVuc2dkdXlkZ3d1ZGdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxOTk1ODIsImV4cCI6MjEwMDc3NTU4Mn0.OrBT5h6GTaRqSY5CM3sk6INLz9oQ-FOVoJ_RYKGWvH8',
 
   // ---- Identidade ----------------------------------------------
