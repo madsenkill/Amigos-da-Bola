@@ -29,8 +29,6 @@ export function renderHighlightCard(containerId, title, badgeText, badgeType, pl
     return;
   }
 
-  // CORREÇÃO AQUI: Em vez de usar renderBadge() dentro do template string, 
-  // geramos a classe do badge diretamente em texto HTML.
   const badgeClass = `badge badge-${badgeType}`;
 
   container.innerHTML = `
