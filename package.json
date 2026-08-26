@@ -1,0 +1,15 @@
+{
+  "name": "pelada-de-terca",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Sistema de gerenciamento da Pelada de Terça - ranking, súmulas, financeiro e demandas",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.4.11"
+  }
+}

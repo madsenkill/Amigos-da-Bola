@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Admin · Pelada de Terça</title>
+  <meta name="description" content="Painel administrativo da Pelada de Terça." />
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='%2318181B' stroke='%23F59E0B' stroke-width='2'/%3E%3Cpath d='M12 7l2 4 2-4-2-3z' fill='%23F59E0B'/%3E%3C/svg%3E" />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            night: '#0F0F12',
+            panel: '#18181B',
+            'panel-2': '#1F1F24',
+            gold: '#F59E0B',
+            'gold-soft': '#FBBF24',
+            neon: '#10B981',
+            'neon-soft': '#34D399',
+            dim: '#A1A1AA',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Outfit', 'Inter', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/src/styles.css" />
+</head>
+
+<body class="bg-night text-zinc-200 min-h-screen">
+  <div class="bg-glow min-h-screen">
+
+    <!-- ==================== HEADER ==================== -->
+    <header class="sticky top-0 z-40 backdrop-blur-xl bg-night/80 border-b border-white/[0.06]">
+      <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+        <a href="/" class="flex items-center gap-3 min-w-0">
+          <span class="relative grid place-items-center w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 shadow-lg shadow-amber-500/30 flex-none">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#241503" stroke-width="1.8">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 7.5 14.2 10l.6-3.1L12 5l-2.8 1.9L9.8 10 12 7.5z" fill="#241503" stroke="none" />
+              <path d="M4.5 9l4 1.5M19.5 9l-4 1.5M5.2 16.5l3.6-1.8M18.8 16.5l-3.6-1.8M12 21v-4" stroke-linecap="round" />
+            </svg>
+          </span>
+          <span class="min-w-0">
+            <span class="block font-display font-extrabold text-white leading-tight truncate" data-nome-pelada>Pelada de Terça</span>
+            <span class="block text-[11px] text-amber-400/90 font-semibold tracking-widest uppercase">Painel Admin</span>
+          </span>
+        </a>
+        <a href="/" class="btn btn-ghost btn-sm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+          Ver área pública
+        </a>
+      </div>
+    </header>
+
+    <!-- ==================== TABS ==================== -->
+    <nav class="max-w-6xl mx-auto px-4 pt-5">
+      <div class="tabs" role="tablist" aria-label="Seções administrativas">
+        <button class="tab active" data-tab="sumula" role="tab">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5 14.2 10l.6-3.1L12 5l-2.8 1.9L9.8 10 12 7.5z" fill="currentColor" stroke="none"/></svg>
+          Lançar Rodada
+        </button>
+        <button class="tab" data-tab="jogadores" role="tab">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Jogadores
+        </button>
+        <button class="tab" data-tab="financeiro" role="tab">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 12h.01M18 12h.01"/></svg>
+          Financeiro
+        </button>
+        <button class="tab" data-tab="demandas" role="tab">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0z"/></svg>
+          Demandas
+          <span id="badge-demandas-abertas" class="badge badge-red hidden">0</span>
+        </button>
+      </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 py-6">
+
+      <!-- ============ ABA: SÚMULA ============ -->
+      <section id="painel-sumula" class="tab-panel" role="tabpanel">
+        <div class="grid lg:grid-cols-3 gap-5 items-start">
+          <!-- Formulário da súmula -->
+          <div class="lg:col-span-2 card space-y-5">
+            <div>
+              <h2 class="font-display font-bold text-lg text-white">Lançar Rodada (Súmula)</h2>
+              <p class="text-xs text-zinc-500 mt-0.5">Monte os times, registre os placares e a pontuação individual é calculada automaticamente.</p>
+            </div>
+
+            <!-- Data -->
+            <div class="grid sm:grid-cols-2 gap-3">
+              <div>
+                <label class="label" for="f-data">Data da terça-feira</label>
+                <input type="date" id="f-data" class="input" required />
+              </div>
+              <div>
+                <label class="label" for="f-titulo">Título da rodada</label>
+                <input type="text" id="f-titulo" class="input" placeholder="Ex.: Terça do Clássico" />
+              </div>
+            </div>
+
+            <!-- Partidas -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="label !mb-0">Equipes e resultados</span>
+                <button id="btn-add-partida" type="button" class="btn btn-ghost btn-sm">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                  Adicionar partida
+                </button>
+              </div>
+              <div id="partidas-container" class="space-y-4"></div>
+            </div>
+
+            <!-- Estatísticas individuais -->
+            <div>
+              <span class="label">Estatísticas individuais (pontos automáticos)</span>
+              <div id="stats-container" class="table-wrap"></div>
+              <p class="text-[11px] text-zinc-500 mt-2">Vitória = 3 pts · Empate = 1 pt · Derrota = 0 pts. Gols e cartões são lançados por jogador.</p>
+            </div>
+
+            <!-- Destaques -->
+            <div>
+              <span class="label">Destaques da rodada</span>
+              <div class="grid sm:grid-cols-2 gap-3">
+                <div class="card !bg-panel-2/50 space-y-3">
+                  <span class="badge badge-amber">★ Craque do Dia</span>
+                  <div>
+                    <label class="label" for="f-craque">Jogador</label>
+                    <select id="f-craque" class="select"></select>
+                  </div>
+                  <div>
+                    <label class="label" for="f-craque-motivo">Resumo do desempenho</label>
+                    <textarea id="f-craque-motivo" class="textarea" placeholder="Ex.: dois gols e muita raça"></textarea>
+                  </div>
+                </div>
+                <div class="card !bg-panel-2/50 space-y-3">
+                  <span class="badge badge-red">☆ Bola Murcha</span>
+                  <div>
+                    <label class="label" for="f-murcha">Jogador</label>
+                    <select id="f-murcha" class="select"></select>
+                  </div>
+                  <div>
+                    <label class="label" for="f-murcha-motivo">Motivo da zoeira</label>
+                    <textarea id="f-murcha-motivo" class="textarea" placeholder="Ex.: perdeu gol sem goleiro"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 flex-wrap">
+              <button id="btn-salvar-rodada" type="button" class="btn btn-gold btn-lg flex-1 sm:flex-none">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+                <span id="label-btn-rodada">Salvar Rodada</span>
+              </button>
+              <button id="btn-limpar-rodada" type="button" class="btn btn-ghost">Nova rodada</button>
+              <span id="badge-editando-rodada" class="badge badge-blue hidden">EDITANDO</span>
+            </div>
+          </div>
+
+          <!-- Rodadas lançadas -->
+          <aside class="card space-y-3">
+            <h3 class="font-display font-bold text-white flex items-center justify-between">
+              Rodadas lançadas
+              <span id="qtd-rodadas" class="badge badge-gray"></span>
+            </h3>
+            <div id="lista-rodadas" class="space-y-2"></div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ ABA: JOGADORES ============ -->
+      <section id="painel-jogadores" class="tab-panel hidden" role="tabpanel">
+        <div class="card">
+          <div class="flex items-center justify-between gap-3 mb-4 flex-wrap">
+            <div>
+              <h2 class="font-display font-bold text-lg text-white">Gestão de Jogadores</h2>
+              <p class="text-xs text-zinc-500 mt-0.5">Cadastre, edite, ative ou desative atletas do elenco.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <input id="busca-jogadores" type="search" class="input !w-48" placeholder="Buscar..." />
+              <button id="btn-novo-jogador" type="button" class="btn btn-neon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                Novo jogador
+              </button>
+            </div>
+          </div>
+          <div id="corpo-jogadores" class="table-wrap"></div>
+        </div>
+      </section>
+
+      <!-- ============ ABA: FINANCEIRO ============ -->
+      <section id="painel-financeiro" class="tab-panel hidden" role="tabpanel">
+        <div class="space-y-5">
+          <!-- Cards de resumo do caixa -->
+          <div id="cards-caixa" class="grid sm:grid-cols-3 gap-4"></div>
+
+          <div class="grid lg:grid-cols-2 gap-5 items-start">
+            <!-- Mensalidades -->
+            <div class="card">
+              <div class="flex items-center justify-between gap-3 mb-3 flex-wrap">
+                <h3 class="font-display font-bold text-white">Mensalidades</h3>
+                <div class="flex items-center gap-2">
+                  <select id="mes-mensalidades" class="select !w-40 !py-1.5 !text-xs"></select>
+                  <button id="btn-gerar-mensalidades" type="button" class="btn btn-ghost btn-sm">Gerar mês</button>
+                </div>
+              </div>
+              <div id="corpo-mensalidades" class="table-wrap"></div>
+            </div>
+
+            <!-- Fluxo de caixa -->
+            <div class="card space-y-4">
+              <h3 class="font-display font-bold text-white">Fluxo de Caixa</h3>
+              <form id="form-caixa" class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="label" for="c-tipo">Tipo</label>
+                  <select id="c-tipo" class="select">
+                    <option value="entrada">Entrada</option>
+                    <option value="saida">Saída</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="label" for="c-valor">Valor (R$)</label>
+                  <input id="c-valor" type="number" step="0.01" min="0" class="input" placeholder="20,00" required />
+                </div>
+                <div class="col-span-2">
+                  <label class="label" for="c-descricao">Descrição</label>
+                  <input id="c-descricao" type="text" class="input" placeholder="Ex.: Aluguel da quadra" required />
+                </div>
+                <div class="col-span-2">
+                  <label class="label" for="c-categoria">Categoria</label>
+                  <select id="c-categoria" class="select">
+                    <option value="quadra">Quadra</option>
+                    <option value="colete">Colete / uniforme</option>
+                    <option value="bola">Bola</option>
+                    <option value="mensalidade">Mensalidade</option>
+                    <option value="outros">Outros</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-gold col-span-2">Registrar lançamento</button>
+              </form>
+              <div>
+                <label class="label" for="mes-caixa">Histórico do mês</label>
+                <select id="mes-caixa" class="select"></select>
+                <div id="corpo-caixa" class="mt-2 max-h-72 overflow-y-auto space-y-1.5"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ABA: DEMANDAS ============ -->
+      <section id="painel-demandas" class="tab-panel hidden" role="tabpanel">
+        <div class="card mb-5">
+          <form id="form-demanda" class="space-y-3">
+            <div class="grid sm:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+              <div>
+                <label class="label" for="d-titulo">Nova demanda da diretoria</label>
+                <input id="d-titulo" type="text" class="input" placeholder="Ex.: Comprar 2 bolas novas" required />
+              </div>
+              <div>
+                <label class="label" for="d-prioridade">Prioridade</label>
+                <select id="d-prioridade" class="select">
+                  <option value="alta">Alta (urgente)</option>
+                  <option value="media" selected>Média</option>
+                  <option value="baixa">Baixa</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-gold">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                <span data-label-submit>Adicionar</span>
+              </button>
+            </div>
+            <div class="hidden" data-wrap-descricao>
+              <label class="label" for="d-descricao">Descrição (opcional)</label>
+              <textarea id="d-descricao" class="textarea !min-h-[48px]" placeholder="Detalhes da tarefa..."></textarea>
+            </div>
+          </form>
+        </div>
+        <div id="kanban" class="kanban"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Cliente Supabase (usado apenas se configurado em src/config.js) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Módulo do painel admin -->
+  <script type="module" src="/src/admin.js"></script>
+</body>
+</html>
