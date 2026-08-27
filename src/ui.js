@@ -1,4 +1,4 @@
-import { formatMonthYear, formatCurrency, formatDate } from '../utils.js';
+import { formatMonthYear, formatCurrency, formatDate } from './utils.js';
 
 export function renderHeaderDate(date) {
   const el = document.getElementById('current-month-display');
