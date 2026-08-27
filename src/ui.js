@@ -1,4 +1,3 @@
-// src/ui.js
 import { formatMonthYear, formatCurrency, formatDate } from './utils.js';
 
 export function renderHeaderDate(date) {
