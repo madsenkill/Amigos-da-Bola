@@ -91,7 +91,7 @@ function renderDestaques() {
       <div class="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl pointer-events-none ${tipo === 'craque' ? 'bg-amber-500/15' : 'bg-red-500/10'}"></div>
       <div class="relative flex items-start gap-4">
         <div class="flex flex-col items-center gap-2 flex-none">
-          ${avatar(jogador, 'lg')}
+          ${avatar(jogador, 'lg').outerHTML}
           <span class="badge ${tipo === 'craque' ? 'badge-amber' : 'badge-red'}">${icone} ${titulo}</span>
         </div>
         <div class="min-w-0 pt-1">

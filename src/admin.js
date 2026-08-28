@@ -16,6 +16,19 @@ import { resultadoDePlacar, RESULTADO_LABEL } from './ranking.js'
 import { avatar, emptyState, multiSelect, openModal, toast } from './ui.js'
 
 /* ------------------------------------------------------------
+   Helpers
+------------------------------------------------------------ */
+/** Mensagem amigável para erros de banco (Supabase/RLS). */
+function msgDeErro(e) {
+  const msg = (e && (e.message || e)) || 'erro desconhecido'
+  const t = String(msg)
+  if (/(row.?level security|permission denied|politica|policy|rls)/i.test(t)) {
+    return `${t} — Parece que as políticas do Supabase estão bloqueando a escrita. Rode o schema.sql atualizado (políticas "acesso publico") no SQL Editor.`
+  }
+  return t
+}
+
+/* ------------------------------------------------------------
    Estado global
 ------------------------------------------------------------ */
 const state = {
@@ -511,7 +524,7 @@ function abrirModalJogador(jogador = null) {
           renderJogadores()
         } catch (e) {
           console.error(e)
-          toast('Erro ao salvar jogador.', 'err')
+          toast('Erro ao salvar jogador: ' + msgDeErro(e), 'err')
         }
       })
     },
@@ -526,7 +539,7 @@ async function alternarAtivo(id) {
     await db.saveJogador(j)
     await loadDados()
     renderJogadores()
-  } catch (e) { console.error(e); toast('Erro ao atualizar jogador.', 'err') }
+  } catch (e) { console.error(e); toast('Erro ao atualizar jogador: ' + msgDeErro(e), 'err') }
 }
 
 async function excluirJogador(id) {
@@ -540,7 +553,7 @@ async function excluirJogador(id) {
     preencherSelectsDestaque()
     sincronizarOptionsSumula()
     renderJogadores()
-  } catch (e) { console.error(e); toast('Erro ao excluir jogador.', 'err') }
+  } catch (e) { console.error(e); toast('Erro ao excluir jogador: ' + msgDeErro(e), 'err') }
 }
 
 /* ============================================================
