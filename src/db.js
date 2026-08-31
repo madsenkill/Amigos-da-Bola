@@ -164,8 +164,11 @@ const remapRodada = (r) => ({
   partidas: (r.partidas || []).map(p => ({
     id: p.id,
     nome: p.nome,
+    confronto: p.confronto || 'AB',
     time_a: p.time_a_ids || [],
     time_b: p.time_b_ids || [],
+    time_c: p.time_c_ids || [],
+    time_d: p.time_d_ids || [],
     gols_a: p.gols_a,
     gols_b: p.gols_b,
   })),
@@ -249,7 +252,9 @@ const supabase = {
     if (rodada.partidas.length) {
       const partidasRows = rodada.partidas.map(p => ({
         id: p.id, rodada_id: rodadaId, nome: p.nome,
+        confronto: p.confronto || 'AB',
         time_a_ids: p.time_a, time_b_ids: p.time_b,
+        time_c_ids: p.time_c || [], time_d_ids: p.time_d || [],
         gols_a: p.gols_a, gols_b: p.gols_b,
       }))
       const { error: eInsP } = await sb.from('partidas').insert(partidasRows)

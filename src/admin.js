@@ -110,8 +110,7 @@ function preencherSelectsDestaque() {
 /** Sincroniza as opções dos multi-selects da súmula (após CRUD de jogador). */
 function sincronizarOptionsSumula() {
   sumula.partidas.forEach(p => {
-    p.timeA.setOptions(ativos())
-    p.timeB.setOptions(ativos())
+    for (const l of ['A', 'B', 'C', 'D']) p.ms[l].setOptions(ativos())
   })
 }
 
@@ -123,25 +122,52 @@ const sumula = {
 }
 const statsValores = new Map() // `${partidaId}:${jogadorId}` -> { gols, amarelos, vermelhos }
 
-/** Adiciona uma linha de partida ao formulário. */
+/** Adiciona uma linha de partida ao formulário (4 times + confronto). */
 function addPartidaRow(inicial = {}) {
+  const conf = (inicial.confronto || 'AB').toUpperCase().replace(/[^A-D]/g, '')
+  const confronto = /^[A-D]{2}$/.test(conf) ? conf : 'AB'
+  const [l1, l2] = confronto.split('')
+  const restantes = ['A', 'B', 'C', 'D'].filter(l => l !== l1 && l !== l2)
+
+  const idsPorLetra = {}
+  idsPorLetra[l1] = inicial.time_a || []
+  idsPorLetra[l2] = inicial.time_b || []
+  idsPorLetra[restantes[0]] = inicial.time_c || []
+  idsPorLetra[restantes[1]] = inicial.time_d || []
+
+  const gols = { A: '', B: '', C: '', D: '' }
+  gols[l1] = inicial.gols_a === undefined ? '' : num(inicial.gols_a)
+  gols[l2] = inicial.gols_b === undefined ? '' : num(inicial.gols_b)
+
   const row = document.createElement('div')
   row.className = 'partida-row'
   row.innerHTML = `
     <div class="card !bg-panel-2/50 !p-4 space-y-3">
-      <div class="grid sm:grid-cols-[1fr_auto_1fr] gap-4 items-end">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        ${['A', 'B', 'C', 'D'].map(l => `
+          <div>
+            <span class="label !mb-2">Time ${l}</span>
+            <div class="ms-${l.toLowerCase()}"></div>
+          </div>`).join('')}
+      </div>
+      <div class="flex flex-wrap items-end gap-4">
         <div>
-          <span class="label !mb-2">Time A</span>
-          <div class="ms-a"></div>
+          <span class="label !mb-2">Confronto</span>
+          <select data-confronto class="input">
+            ${['AB', 'AC', 'AD', 'BC', 'BD', 'CD'].map(pair =>
+              `<option value="${pair}" ${pair === confronto ? 'selected' : ''}>Time ${pair[0]} × Time ${pair[1]}</option>`).join('')}
+          </select>
         </div>
-        <div class="flex items-center justify-center gap-2 pb-1">
-          <input type="number" min="0" max="30" data-gols-a class="input !w-16 !px-1 !py-2 text-center font-display font-bold" value="${num(inicial.gols_a)}" />
-          <span class="text-zinc-600 font-bold">x</span>
-          <input type="number" min="0" max="30" data-gols-b class="input !w-16 !px-1 !py-2 text-center font-display font-bold" value="${num(inicial.gols_b)}" />
-        </div>
-        <div>
-          <span class="label !mb-2">Time B</span>
-          <div class="ms-b"></div>
+        <div class="flex items-end gap-2">
+          <div>
+            <span class="label !mb-2" data-lbl-x>Time ${l1}</span>
+            <input type="number" min="0" max="30" data-gols-x class="input !w-16 !px-1 !py-2 text-center font-display font-bold" value="${gols[l1]}" />
+          </div>
+          <span class="text-zinc-600 font-bold pb-2">x</span>
+          <div>
+            <span class="label !mb-2" data-lbl-y>Time ${l2}</span>
+            <input type="number" min="0" max="30" data-gols-y class="input !w-16 !px-1 !py-2 text-center font-display font-bold" value="${gols[l2]}" />
+          </div>
         </div>
       </div>
       <div class="flex justify-end">
@@ -152,19 +178,39 @@ function addPartidaRow(inicial = {}) {
       </div>
     </div>`
 
-  const msA = multiSelect(row.querySelector('.ms-a'), ativos(), inicial.time_a || [], renderStats)
-  const msB = multiSelect(row.querySelector('.ms-b'), ativos(), inicial.time_b || [], renderStats)
-  const golsA = row.querySelector('[data-gols-a]')
-  const golsB = row.querySelector('[data-gols-b]')
-  golsA.addEventListener('input', renderStats)
-  golsB.addEventListener('input', renderStats)
+  const ms = {}
+  for (const l of ['A', 'B', 'C', 'D']) {
+    ms[l] = multiSelect(row.querySelector(`.ms-${l.toLowerCase()}`), ativos(), idsPorLetra[l] || [], renderStats)
+  }
+  const confSel = row.querySelector('[data-confronto]')
+  const golsX = row.querySelector('[data-gols-x]')
+  const golsY = row.querySelector('[data-gols-y]')
+  const lblX = row.querySelector('[data-lbl-x]')
+  const lblY = row.querySelector('[data-lbl-y]')
+
+  const lerGols = () => {
+    const [x, y] = confSel.value.split('')
+    gols[x] = golsX.value
+    gols[y] = golsY.value
+  }
+  const atualizarGols = () => {
+    const [x, y] = confSel.value.split('')
+    golsX.value = gols[x] === '' ? '' : num(gols[x])
+    golsY.value = gols[y] === '' ? '' : num(gols[y])
+    lblX.textContent = `Time ${x}`
+    lblY.textContent = `Time ${y}`
+  }
+
+  golsX.addEventListener('input', () => { lerGols(); renderStats() })
+  golsY.addEventListener('input', () => { lerGols(); renderStats() })
+  confSel.addEventListener('change', () => { lerGols(); atualizarGols(); renderStats() })
   row.querySelector('[data-remove]').addEventListener('click', () => {
     sumula.partidas = sumula.partidas.filter(p => p.row !== row)
     row.remove()
     renderStats()
   })
 
-  const p = { id: inicial.id || uid(), row, timeA: msA, timeB: msB, golsA, golsB }
+  const p = { id: inicial.id || uid(), row, ms, confSel, gols, lerGols, atualizarGols }
   sumula.partidas.push(p)
   els.partidasContainer.appendChild(row)
   renderStats()
@@ -181,11 +227,12 @@ function renderStats() {
     <th>Gols</th><th>Amar.</th><th>Verm.</th></tr></thead><tbody>`
 
   for (const p of sumula.partidas) {
-    const resA = resultadoDePlacar(p.golsA.value, p.golsB.value)
-    const resB = resultadoDePlacar(p.golsB.value, p.golsA.value)
+    const [x, y] = p.confSel.value.split('')
+    const resX = resultadoDePlacar(p.gols[x], p.gols[y])
+    const resY = resultadoDePlacar(p.gols[y], p.gols[x])
     const times = [
-      ['A', resA, p.timeA.getValue()],
-      ['B', resB, p.timeB.getValue()],
+      [x, resX, p.ms[x].getValue()],
+      [y, resY, p.ms[y].getValue()],
     ]
     for (const [letra, res, ids] of times) {
       for (const jid of ids) {
@@ -240,13 +287,20 @@ async function salvarRodada() {
   const data = els.fData.value
   if (!data) { toast('Informe a data da terça-feira.', 'err'); return }
 
-  const partidas = sumula.partidas.map(p => ({
-    id: p.id,
-    time_a: p.timeA.getValue(),
-    time_b: p.timeB.getValue(),
-    gols_a: num(p.golsA.value),
-    gols_b: num(p.golsB.value),
-  }))
+  const partidas = sumula.partidas.map(p => {
+    const [x, y] = p.confSel.value.split('')
+    const restantes = ['A', 'B', 'C', 'D'].filter(l => l !== x && l !== y)
+    return {
+      id: p.id,
+      confronto: p.confSel.value,
+      time_a: p.ms[x].getValue(),
+      time_b: p.ms[y].getValue(),
+      time_c: p.ms[restantes[0]].getValue(),
+      time_d: p.ms[restantes[1]].getValue(),
+      gols_a: num(p.gols[x]),
+      gols_b: num(p.gols[y]),
+    }
+  })
   const comJogadores = partidas.filter(p => p.time_a.length || p.time_b.length)
   if (!comJogadores.length) { toast('Adicione pelo menos uma partida com jogadores.', 'err'); return }
 
@@ -257,11 +311,12 @@ async function salvarRodada() {
   // Gera as estatísticas individuais com os pontos automáticos
   const estatisticas = []
   for (const p of comJogadores) {
-    const resA = resultadoDePlacar(p.gols_a, p.gols_b)
-    const resB = resultadoDePlacar(p.gols_b, p.gols_a)
+    const [x, y] = p.confronto.split('')
+    const resX = resultadoDePlacar(p.gols_a, p.gols_b)
+    const resY = resultadoDePlacar(p.gols_b, p.gols_a)
     const times = [
-      ['A', resA, p.time_a],
-      ['B', resB, p.time_b],
+      [x, resX, p.time_a],
+      [y, resY, p.time_b],
     ]
     for (const [letra, res, ids] of times) {
       for (const jid of ids) {
@@ -318,7 +373,7 @@ function editarRodada(id) {
   statsValores.clear()
 
   for (const p of r.partidas) {
-    addPartidaRow({ id: p.id, time_a: p.time_a, time_b: p.time_b, gols_a: p.gols_a, gols_b: p.gols_b })
+    addPartidaRow({ id: p.id, confronto: p.confronto, time_a: p.time_a, time_b: p.time_b, time_c: p.time_c, time_d: p.time_d, gols_a: p.gols_a, gols_b: p.gols_b })
   }
   for (const e of r.estatisticas) {
     statsValores.set(`${e.partida_id}:${e.jogador_id}`, {

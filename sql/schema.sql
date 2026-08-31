@@ -36,18 +36,28 @@ create table if not exists public.rodadas (
 );
 
 -- ------------------------------------------------------------
--- PARTIDAS (jogos de uma rodada: Time A x Time B)
--- time_a_ids / time_b_ids guardam os ids dos jogadores de cada time
+-- PARTIDAS (jogos de uma rodada)
+-- Cada partida tem 4 times (A, B, C, D); apenas os 2 times do
+-- confronto (coluna confronto) se enfrentam. Os demais ficam
+-- guardados para a próxima partida.
 -- ------------------------------------------------------------
 create table if not exists public.partidas (
   id          uuid primary key default gen_random_uuid(),
   rodada_id   uuid not null references public.rodadas(id) on delete cascade,
   nome        text,
+  confronto   text not null default 'AB',
   time_a_ids  uuid[] not null default '{}',
   time_b_ids  uuid[] not null default '{}',
+  time_c_ids  uuid[] not null default '{}',
+  time_d_ids  uuid[] not null default '{}',
   gols_a      integer not null default 0,
   gols_b      integer not null default 0
 );
+
+-- Colunas novas para tabelas já criadas (script re-executável)
+alter table public.partidas add column if not exists confronto  text not null default 'AB';
+alter table public.partidas add column if not exists time_c_ids uuid[] not null default '{}';
+alter table public.partidas add column if not exists time_d_ids uuid[] not null default '{}';
 
 -- ------------------------------------------------------------
 -- ESTATÍSTICAS INDIVIDUAIS (pontuação por jogador na rodada)
@@ -141,15 +151,19 @@ alter table public.mensalidades         enable row level security;
 alter table public.caixa                enable row level security;
 alter table public.demandas             enable row level security;
 
--- Remove políticas antigas (para o script poder ser re-executado
--- sem erro de "policy already exists")
+-- Remove TODAS as políticas existentes dessas tabelas (para o script
+-- poder ser re-executado sem erro de "policy already exists", qualquer
+-- que seja o nome antigo das políticas)
 do $$
-declare t text;
+declare t text; pol record;
 begin
   foreach t in array array['jogadores','rodadas','partidas','estatisticas_jogador','mensalidades','caixa','demandas'] loop
-    execute format('drop policy if exists "leitura publica %s" on public.%I', t, t);
-    execute format('drop policy if exists "escrita autenticada %s" on public.%I', t, t);
-    execute format('drop policy if exists "acesso publico %s" on public.%I', t, t);
+    for pol in
+      select policyname from pg_policies
+      where schemaname = 'public' and tablename = t
+    loop
+      execute format('drop policy if exists %I on public.%I', pol.policyname, t);
+    end loop;
   end loop;
 end $$;
 
