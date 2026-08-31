@@ -120,7 +120,7 @@ function renderRanking() {
   els.periodo.setAttribute('title', `Pontuação válida para ${formatarMes(state.mes)}`)
 
   if (!ranking.length) {
-    els.ranking.innerHTML = emptyState(`Sem jogos em ${esc(formatarMes(state.mes))}. A tabela aparece após a primeira terça lançada.`)
+    els.ranking.innerHTML = emptyState(`Sem jogos em ${esc(formatarMes(state.mes))}. A tabela aparece após a primeira terça lançada.`).outerHTML
     return
   }
 
