@@ -121,9 +121,17 @@ create index if not exists idx_mensalidades_jogador  on public.mensalidades (jog
 create index if not exists idx_caixa_mes             on public.caixa (mes);
 
 -- ------------------------------------------------------------
--- ROW LEVEL SECURITY (opção padrão sugerida)
--- Leitura pública e escrita autenticada.
--- Ajuste conforme a política da sua diretoria.
+-- ROW LEVEL SECURITY
+--
+-- IMPORTANTE: o app NÃO possui tela de login (usa a anon key no
+-- frontend). Para o painel admin conseguir adicionar/editar/excluir,
+-- as políticas abaixo liberam leitura E escrita para todos os
+-- usuários (anon + autenticado).
+--
+-- ATENÇÃO: como a anon key é pública, qualquer pessoa com acesso
+-- ao site pode alterar os dados. Para a sua pelada isso é aceitável.
+-- Se no futuro quiser proteger o painel, crie um login com o Supabase
+-- Auth e troque as políticas de escrita para exigir auth.role() = 'authenticated'.
 -- ------------------------------------------------------------
 alter table public.jogadores            enable row level security;
 alter table public.rodadas              enable row level security;
@@ -133,20 +141,23 @@ alter table public.mensalidades         enable row level security;
 alter table public.caixa                enable row level security;
 alter table public.demandas             enable row level security;
 
--- Leitura para todos (anon + autenticado)
-create policy "leitura publica jogadores"            on public.jogadores            for select using (true);
-create policy "leitura publica rodadas"              on public.rodadas              for select using (true);
-create policy "leitura publica partidas"             on public.partidas             for select using (true);
-create policy "leitura publica estatisticas"         on public.estatisticas_jogador for select using (true);
-create policy "leitura publica mensalidades"         on public.mensalidades         for select using (true);
-create policy "leitura publica caixa"                on public.caixa                for select using (true);
-create policy "leitura publica demandas"             on public.demandas             for select using (true);
+-- Remove políticas antigas (para o script poder ser re-executado
+-- sem erro de "policy already exists")
+do $$
+declare t text;
+begin
+  foreach t in array array['jogadores','rodadas','partidas','estatisticas_jogador','mensalidades','caixa','demandas'] loop
+    execute format('drop policy if exists "leitura publica %s" on public.%I', t, t);
+    execute format('drop policy if exists "escrita autenticada %s" on public.%I', t, t);
+    execute format('drop policy if exists "acesso publico %s" on public.%I', t, t);
+  end loop;
+end $$;
 
--- Escrita apenas para usuários autenticados
-create policy "escrita autenticada jogadores"            on public.jogadores            for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
-create policy "escrita autenticada rodadas"              on public.rodadas              for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
-create policy "escrita autenticada partidas"             on public.partidas             for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
-create policy "escrita autenticada estatisticas"         on public.estatisticas_jogador for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
-create policy "escrita autenticada mensalidades"         on public.mensalidades         for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
-create policy "escrita autenticada caixa"                on public.caixa                for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
-create policy "escrita autenticada demandas"             on public.demandas             for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+-- Acesso total (leitura + escrita) para todos
+create policy "acesso publico jogadores"            on public.jogadores            for all using (true) with check (true);
+create policy "acesso publico rodadas"              on public.rodadas              for all using (true) with check (true);
+create policy "acesso publico partidas"             on public.partidas             for all using (true) with check (true);
+create policy "acesso publico estatisticas"         on public.estatisticas_jogador for all using (true) with check (true);
+create policy "acesso publico mensalidades"         on public.mensalidades         for all using (true) with check (true);
+create policy "acesso publico caixa"                on public.caixa                for all using (true) with check (true);
+create policy "acesso publico demandas"             on public.demandas             for all using (true) with check (true);

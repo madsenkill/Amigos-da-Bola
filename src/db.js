@@ -27,7 +27,7 @@ const LS = {
   mensalidades: 'pelada.mensalidades',
   caixa: 'pelada.caixa',
   demandas: 'pelada.demandas',
-  meta: 'pelada.meta',
+  meta: 'pelada.meta.v2',
 }
 
 let mode = 'local'

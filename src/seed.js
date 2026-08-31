@@ -231,16 +231,21 @@ function rodadasSeed(jogadores) {
   return cfg.map(c => buildRodada(c))
 }
 
-/** Monta o objeto SEED completo (jogadores, rodadas, financeiro, demandas). */
+/**
+ * Monta o objeto SEED completo (jogadores, rodadas, financeiro, demandas).
+ *
+ * Seed de demonstração esvaziado a pedido do usuário: o app agora inicia
+ * sem dados de exemplo (cada lista começa vazia).
+ * Para voltar a usar os dados demo, basta chamar as funções originais
+ * abaixo (jogadoresSeed, rodadasSeed, financeiroSeed, demandasSeed)
+ * e trocar o retorno por `{ jogadores, rodadas: rodadasSeed(jogadores), mensalidades, caixa, demandas: demandasSeed() }`.
+ */
 export function buildSeed() {
-  const jogadores = jogadoresSeed()
-  const mes = mesAtual()
-  const { mensalidades, caixa } = financeiroSeed(jogadores, mes)
   return {
-    jogadores,
-    rodadas: rodadasSeed(jogadores),
-    mensalidades,
-    caixa,
-    demandas: demandasSeed(),
+    jogadores: [],
+    rodadas: [],
+    mensalidades: [],
+    caixa: [],
+    demandas: [],
   }
 }
